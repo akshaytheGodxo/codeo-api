@@ -31,8 +31,14 @@ export const register = async (req, res) => {
             process.env.JWT_SECRET, // make sure JWT_SECRET is in your .env
             { expiresIn: "7d" }
         );
+        res.cookie("auth_token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
 
-        return res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name } });
+        return res.status(201).json({ message: "User registered successfully!", user: { id: user.id, email: user.email, name: user.name } });
     } catch (error) {
         console.error("Register error:", error);
         return res.status(500).json({ message: "Internal server error" });
